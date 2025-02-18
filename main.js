@@ -1,45 +1,61 @@
-const master_input = document.querySelector("#master-sequence");
-const new_element_input = document.querySelector("#new-element-input");
-const sources_container = document.querySelector("#saved-elements");
+const master_password = document.querySelector("#master-password");
+const sources_container = document.querySelector("#sources-container");
+const safe_text_element = document.createElement('div');
 const encoder = new TextEncoder();
+const local_storage_sources_location = "pwpal-sources";
 
+const sources = JSON.parse(localStorage.getItem(local_storage_sources_location)) ?? [];
 
-function CreateSourceElement(s) {
-	const container = document.createElement('div');
-	const span = document.createElement('span');
-	span.textContent = s;
-	container.appendChild(span);
-	const passwordCap = document.createElement('input')
-	passwordCap.setAttribute('type', 'number');
-	passwordCap.value = "16";
-	container.appendChild(passwordCap);
-	const deleteButton = document.createElement('button');
-	deleteButton.textContent = "Delete"
-	deleteButton.addEventListener('click', DeleteElement);
-	container.appendChild(deleteButton);
-	const copyButton = document.createElement('button');
-	copyButton.textContent = "Copy Password"
-	copyButton.addEventListener('click', CopyPassword);
-	container.appendChild(copyButton);
-	return container;
+function EscapeString(s) {
+	safe_text_element.textContent = s;
+	return safe_text_element.innerHTML;
+}
+
+function RenderSourcesList() {
+	const sources_html = sources.map((p, i) => 
+		`<div class="password-source">
+			<span>${EscapeString(p[0])}</span>
+			<input type="number" value="${p[1]}" name="password-length" onchange="SetSourcePasswordLen(${i}, parseInt(this.value))">
+			<button onclick="DeleteSource(${i})" class="delete">Delete</button>
+			<button onclick="CopyPassword(${i})" class="primary">Copy</button>
+		</div>`
+	).join('');
+	const add_source = 
+		`<div class="password-source">
+			<input id="new-element-input" type="text" placeholder="New source">
+			<button onclick="AddSourceEvent()">+</button>
+		</div>`;
+	sources_container.innerHTML = sources_html + add_source;
 }
 
 
-function DeleteElement(e) {
-	e.target.parentElement.remove();
+function DeleteSource(i) {
+	sources.splice(i, 1);
+	localStorage.setItem(local_storage_sources_location, JSON.stringify(sources));
+	RenderSourcesList();
 }
 
-async function CopyPassword(e) {
-	const source = e.target.parentElement.firstChild.textContent;
-	const salted_pw = master_input.value + source;
+async function CopyPassword(i) {
+	const source = sources[i][0];
+	const pw_len = sources[i][1];
+	const salted_pw = master_password.value + source;
 	const hash = await HashInput(salted_pw);
-	const pw_len_cap = e.target.parentElement.children[1].value - 0;
 	// you need 44.8 base64 into 2^512, considering 22 as center
-	const start = 22 - (pw_len_cap >> 1);
-	const final_pw = hash.slice(start, start + pw_len_cap);
+	const start = 22 - (pw_len >> 1);
+	const final_pw = hash.slice(start, start + pw_len);
 	await navigator.clipboard.writeText(final_pw);
 }
 
+function AddSourceEvent(e) {
+	sources.push([document.querySelector("#new-element-input").value, 16]);
+	localStorage.setItem(local_storage_sources_location, JSON.stringify(sources));
+	RenderSourcesList();
+}
+
+function SetSourcePasswordLen(s_i, l) {
+	sources[s_i][1] = l;
+	localStorage.setItem(local_storage_sources_location, JSON.stringify(sources));
+}
 
 async function HashInput(input) {
 	const data = encoder.encode(input);
@@ -50,8 +66,4 @@ async function HashInput(input) {
 	return password;
 }
 
-
-document.querySelector("#new-element-button").addEventListener('click', () => {
-	sources_container.appendChild(CreateSourceElement(new_element_input.value));
-	new_element_input.value = "";
-});
+RenderSourcesList();

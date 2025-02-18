@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,23 +8,13 @@
 	<link rel="stylesheet" href="global.css">
 </head>
 <body>
-	<header>
-		<h1>PwPal</h1>
-	</header>
 	<main>
-		<div class="input-box">
-			<label for="master-sequence">Master Sequence</label>
-			<input id="master-sequence" type="password">
+		<h1>PwPal</h1>
+		<div class="main-actions-container">
+			<input id="master-password" type="password" name="password" placeholder="Master Password">
+			<!--<button class="primary">Export Password List</button>-->
 		</div>
-		<section id="saved-elements">
-		</section>
-		<div class="add-element-row">
-			<div class="input-box">
-				<label for="new-element-input">Add Source</label>
-				<input id="new-element-input" type="text">
-				<button id="new-element-button">Add</button>
-			</div>
+		<div id="sources-container">
 		</div>
-	</main>
 	<script src="main.js"></script>
 </body>

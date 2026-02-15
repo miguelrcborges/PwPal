@@ -1,148 +1,236 @@
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html, body {
-  font-family: "Helvetica Neue", Arial, sans-serif;
-  background-color: #121212; 
-  color: #ffffff;
-  height: 100%;
-  margin: 0;
-  padding: 0;
+	box-sizing: border-box;
+	border: none;
 }
 
 body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+	background-color: var(--background);
+	color: var(--text);
+	font-family: system-ui, sans-serif;
+	font-weight: normal;
+	margin: 0;
 }
 
 main {
-  width: 100%;
-  max-width: 600px;
-  padding: 1.5rem;
+	margin: 0 auto;
+	max-width: 600px;
+	padding: 20px 40px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 }
 
-h1 {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-  color: #eeeeee;
-  text-align: center;
-}
-
-.main-actions-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 2rem;
-}
-
-#master-password {
-  flex: 1;
-  min-width: 200px;
-  border: none;
-  border-radius: 4px;
-  outline: none;
-  padding: 0.75rem 1rem;
-  background-color: #1f1f1f;
-  color: #ffffff;
+.actions-container {
+	display: flex;
+	flex-direction: row;
+	gap: 16px;
+	width: 100%;
 }
 
 button {
-  border: none;
-  padding: 0.75rem 1rem;
-  cursor: pointer;
-  font-size: 1rem;
-  border-radius: 4px;
-  transition: background-color 0.3s ease, opacity 0.3s ease;
+	font-family: sans-serif;
+	font-weight: 700;
+	color: var(--text);
 }
+
 button:hover {
-  opacity: 0.9;
-}
-button:active {
-  opacity: 0.75;
-}
-button.primary {
-  background-color: #5f80f4;
-  color: #ffffff;
+	cursor: pointer;
 }
 
-button.delete {
-  background-color: #d04444;
-  color: #ffffff;
+.actions-container>button {
+	aspect-ratio: 1;
+	width: 56px;
+	font-size: var(--h3);
+	border-radius: 25%;
+	flex-shrink: 0;
+	
+	transition: 200ms ease-out;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
 }
 
-#sources-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.actions-container>button:hover {
+	border-radius: 0;
+}
+
+input {
+	background-color: rgba(0 0 0 / 0.25);
+	padding: 0.75em 1.5em;
+	border-radius: 14px;
+	color: var(--text)
+}
+
+#master_password_input {
+	flex-grow: 1;
+	flex-shrink: 1;
+	min-width: 0;
+}
+
+.primary-btn {
+	background-color: rgba(from var(--primary) r g b / 0.7);
+}
+
+.secondary-btn {
+	background-color: rgba(from var(--secondary) r g b / 0.7);
+}
+
+.sources-header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: end;
+	gap: 16px;
+	width: 100%;
+	padding: 32px 0;
+}
+
+.sources-header>h3 {
+	margin: 0;
+}
+
+.sources-header>input {
+	max-width: 50%;
+}
+
+dialog {
+	background-color: var(--background);
+	color: var(--text);
+	border-radius: 28px;
+	padding: 28px;
+	max-width: 500px;
+	width: 90%;
+}
+
+dialog::backdrop {
+	backdrop-filter: blur(4px);
+	background-color: #1818187f;
+}
+
+#new_entry_dialog>form {
+	display: flex;
+	flex-direction: column;
+	gap: 36px;
+	font-size: var(--h5);
+	font-weight: 700;
+}
+
+form>label {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.form-actions {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+	align-items: center;
+	gap: 16px;
+}
+
+#new_entry_dialog button {
+	width: 80px;
+	height: 40px;
+}
+
+#sources_container {
+	margin: 0;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
 }
 
 .password-source {
-  display: flex;
-  align-items: center;
-  background-color: #1c1c1c;
-  padding: 1rem;
-  border-radius: 6px;
-  gap: 0.75rem;
+	background-color: rgba(from var(--secondary) r g b / 0.15);
+	width: 100%;
+	padding: 16px 32px;
+	border-radius: 16px;
+	display: flex;
+	flex-direction: row;
+	gap: 32px;
+	row-gap: 16px;
+	flex-wrap: wrap;
+	overflow-wrap: break-word;
+	align-items: center;
 }
 
-.password-source span {
-  flex: 1;
-  font-weight: 500;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.password-source>*:last-child {
+	margin-left: auto;
 }
 
-.password-source input[type="number"],
-.password-source input[type="text"] {
-  flex: 0 0 100px;
-  background-color: #1f1f1f;
-  border: none;
-  border-radius: 4px;
-  padding: 0.5rem;
-  color: #ffffff;
-  outline: none;
+.password-source>h5 {
+	margin: 0;
+	max-width: 100%;
 }
 
-#new-element-input {
-  flex: 1;
-  min-width: 120px;
+.inline-buttons {
+	display: flex;
+	flex-direction: row;
+	gap: 16px;
 }
 
-input:focus {
-  border: 2px solid #5f80f4;
+.password-source button {
+	width: 80px;
+	flex: 0 1 200px;
+	min-width: 0;
+	aspect-ratio: 2;
+	font-size: var(--p);
+	border-radius: 10px;
 }
 
-button.delete:hover {
-  background-color: #b63a3a;
+
+h1 {
+	font-size: var(--h1);
 }
 
-button.primary:hover {
-  background-color: #4f6dc8;
+h2 {
+	font-size: var(--h2);
 }
 
-.password-source {
-  transition: background-color 0.3s ease;
-}
-  background-color: #1d1d1d;
+h3 {
+	font-size: var(--h3);
 }
 
-@media (max-width: 480px) {
-  .password-source {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .password-source span,
-  .password-source input,
-  .password-source button {
-    width: 100%;
-    margin-bottom: 0.5rem;
-  }
+h4 {
+	font-size: var(--h4);
 }
 
+h5 {
+	font-size: var(--h5);
+}
+
+:root {
+	--font-scale: 1.25;
+	--p: 1rem;
+	--h5: calc(var(--p) * var(--font-scale));
+	--h4: calc(var(--h5) * var(--font-scale));
+	--h3: calc(var(--h4) * var(--font-scale));
+	--h2: calc(var(--h3) * var(--font-scale));
+	--h1: calc(var(--h2) * var(--font-scale));
+	--small: calc(var(--p) / var(--font-scale));
+}
+
+/* Theme. Generate at www.realtimecolors.com/ */
+@media (prefers-color-scheme: light) {
+	:root {
+		--text: #072222;
+		--background: #e9fbfa;
+		--primary: #15706f;
+		--secondary: #76a4e5;
+		--accent: #2339b8;
+	}
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--text: #ddf8f8;
+		--background: #041615;
+		--primary: #90eae8;
+		--secondary: #1a4889;
+		--accent: #475ddc;
+	}
+}

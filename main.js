@@ -1,10 +1,7 @@
-const master_password = document.querySelector("#master-password");
-const sources_container = document.querySelector("#sources-container");
-const safe_text_element = document.createElement('div');
 const encoder = new TextEncoder();
 const local_storage_sources_location = "pwpal-sources";
-
 const sources = JSON.parse(localStorage.getItem(local_storage_sources_location)) ?? [];
+const safe_text_element = document.createElement('div');
 
 function EscapeString(s) {
 	safe_text_element.textContent = s;
@@ -12,20 +9,19 @@ function EscapeString(s) {
 }
 
 function RenderSourcesList() {
-	const sources_html = sources.map((p, i) => 
-		`<div class="password-source">
-			<span>${EscapeString(p[0])}</span>
-			<input type="number" value="${p[1]}" name="password-length" onchange="SetSourcePasswordLen(${i}, parseInt(this.value))">
-			<button onclick="DeleteSource(${i})" class="delete">Delete</button>
-			<button onclick="CopyPassword(${i})" class="primary">Copy</button>
-		</div>`
-	).join('');
-	const add_source = 
-		`<div class="password-source">
-			<input id="new-element-input" type="text" placeholder="New source">
-			<button onclick="AddSourceEvent()">+</button>
-		</div>`;
-	sources_container.innerHTML = sources_html + add_source;
+	const filter = sources_filter_input.value.toUpperCase();
+	const sources_html = sources
+		.filter(s => s[0].toUpperCase().includes(filter))
+		.map((p, i) =>
+			`<div class="password-source">
+				<h5>${EscapeString(p[0])}</h5>
+				<div class="inline-buttons">
+					<button onclick="DeleteSource(${i})" class="secondary-btn">Delete</button>
+					<button onclick="CopyPassword(${i})" class="primary-btn">Copy</button>
+				</div>
+			</div>`
+		).join('');
+	sources_container.innerHTML = sources_html;
 }
 
 
@@ -38,7 +34,7 @@ function DeleteSource(i) {
 async function CopyPassword(i) {
 	const source = sources[i][0];
 	const pw_len = sources[i][1];
-	const salted_pw = master_password.value + source;
+	const salted_pw = master_password_input.value + source;
 	const hash = await HashInput(salted_pw);
 	// you need 44.8 base64 into 2^512, considering 22 as center
 	const start = 22 - (pw_len >> 1);
@@ -46,15 +42,11 @@ async function CopyPassword(i) {
 	await navigator.clipboard.writeText(final_pw);
 }
 
-function AddSourceEvent(e) {
-	sources.push([document.querySelector("#new-element-input").value, 16]);
+function AddSource() {
+	sources.push([service_name.value, Number(password_length.value)]);
+	sources.sort((s1, s2) => s1[0].toUpperCase() < s2[0].toUpperCase() ? -1 : 1);
 	localStorage.setItem(local_storage_sources_location, JSON.stringify(sources));
 	RenderSourcesList();
-}
-
-function SetSourcePasswordLen(s_i, l) {
-	sources[s_i][1] = l;
-	localStorage.setItem(local_storage_sources_location, JSON.stringify(sources));
 }
 
 async function HashInput(input) {
@@ -65,5 +57,31 @@ async function HashInput(input) {
 	const password = window.btoa(bytes_str);
 	return password;
 }
+
+async function ExportSources() {
+	const data = JSON.stringify(sources);
+	const blob = new Blob([data], {type: "application/json"});
+	const url = URL.createObjectURL(blob);
+	
+	const dummy = document.createElement('a');
+	dummy.href = url;
+	dummy.download = "pwpal_sources.json";
+
+	document.body.appendChild(dummy);
+	dummy.click();
+	document.body.removeChild(dummy);
+	URL.revokeObjectURL(url);
+}
+
+new_entry_btn.addEventListener('click', () => new_entry_dialog.showModal());
+export_btn.addEventListener('click', ExportSources);
+sources_filter_input.addEventListener('input', RenderSourcesList);
+new_entry_dialog.addEventListener('close', (e) => {
+	if (new_entry_dialog.returnValue == "add") {
+		AddSource();
+	}
+	service_name.value = "";
+	password_length.value = 16;
+});
 
 RenderSourcesList();

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,14 +8,37 @@
 	<title>PwPal</title>
 	<link rel="stylesheet" href="global.css">
 </head>
+
 <body>
 	<main>
 		<h1>PwPal</h1>
-		<div class="main-actions-container">
-			<input id="master-password" type="password" name="password" placeholder="Master Password">
-			<!--<button class="primary">Export Password List</button>-->
+		<div class="actions-container">
+			<input id="master_password_input" type="password" name="password" placeholder="Master Password">
+			<button class="primary-btn" id="new_entry_btn" aria-label="New Entry" type="button">+</button>
+			<button class="secondary-btn" id="export_btn" aria-label="Export" type="button">↗</button>
 		</div>
-		<div id="sources-container">
+		<div class="sources-header">
+			<h3>Sources</h3>
+			<input id="sources_filter_input" type="text" name="sources_filter" placeholder="Filter">
 		</div>
+		<div id="sources_container">
+		</div>
+	</main>
+	<dialog id="new_entry_dialog">
+		<form method="dialog">
+			<label for="service_name">
+				Service Name
+				<input type="text" name="service_name" id="service_name">
+			</label>
+			<label for="service_name">
+				Password Length
+				<input type="number" name="password_length" id="password_length" min="8" max="40" value="16">
+			</label>
+			<div class="form-actions">
+				<button class="secondary-btn" type="submit" value="cancel">Close</button>
+				<button class="primary-btn" type="submit" value="add">Add</button>
+			</div>
+		</form>
+	</dialog>
 	<script src="main.js"></script>
 </body>

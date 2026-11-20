@@ -3,42 +3,118 @@
 
 <head>
 	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>PwPal</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+	<meta name="theme-color" content="#123f37">
+	<meta name="description" content="Recreate your passwords locally. No account, no server, no stored passwords.">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="default">
+	<title>PwPal — your passwords, recreated</title>
+	<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+	<link rel="apple-touch-icon" href="icons/icon-192.png">
+	<link rel="manifest" href="manifest.webmanifest">
 	<link rel="stylesheet" href="global.css">
+	<script src="main.js" defer></script>
 </head>
 
 <body>
 	<main>
-		<h1>PwPal</h1>
-		<div class="actions-container">
-			<input id="master_password_input" type="password" name="password" placeholder="Master Password">
-			<button class="primary-btn" id="new_entry_btn" aria-label="New Entry" type="button">+</button>
-			<button class="secondary-btn" id="export_btn" aria-label="Export" type="button">↗</button>
-		</div>
-		<div class="sources-header">
-			<h3>Sources</h3>
-			<input id="sources_filter_input" type="text" name="sources_filter" placeholder="Filter">
-		</div>
-		<div id="sources_container">
-		</div>
+		<header class="app-header">
+			<a class="brand" href="./" aria-label="PwPal home">
+				<img src="icons/icon.svg" width="44" height="44" alt="">
+				<h1>PwPal<span>Your passwords, recreated.</span></h1>
+			</a>
+			<div class="header-actions">
+				<button class="secondary-btn" id="install_btn" type="button" hidden>Install</button>
+				<button class="secondary-btn" id="import_btn" type="button">Import</button>
+				<input id="import_file_input" type="file" accept=".json,application/json" hidden>
+				<button class="secondary-btn" id="export_btn" type="button">Export</button>
+			</div>
+		</header>
+
+		<section class="master-panel" aria-labelledby="master_title">
+			<p class="eyebrow">Less to remember. Nothing to store.</p>
+			<h2 id="master_title">One secret.<br> Every password.</h2>
+			<p class="intro">The same master password and provider settings recreate the same password. Right here, on your device.</p>
+			<label for="master_password_input">Master password</label>
+			<div class="password-field">
+				<input id="master_password_input" type="password" name="password" required
+					autocomplete="off" autocapitalize="off" spellcheck="false"
+					placeholder="Enter your master password" aria-describedby="master_hint">
+				<button id="toggle_password_btn" type="button" class="reveal-btn" aria-pressed="false"
+					aria-label="Show master password">Show</button>
+			</div>
+			<p class="field-hint" id="master_hint">Never saved or sent anywhere. There is no password recovery.</p>
+		</section>
+
+		<section class="providers" aria-labelledby="providers_title">
+			<div class="sources-header">
+				<div>
+					<p class="eyebrow">Your providers</p>
+					<h2 id="providers_title">Ready when you are <span id="sources_count" class="count">0</span></h2>
+				</div>
+				<button class="primary-btn" id="new_entry_btn" type="button">+ Add provider</button>
+			</div>
+			<label class="visually-hidden" for="sources_filter_input">Find a provider</label>
+			<input id="sources_filter_input" type="search" name="sources_filter" placeholder="Find a provider…"
+				autocomplete="off" autocapitalize="off" spellcheck="false" aria-controls="sources_container">
+			<div id="sources_container"></div>
+		</section>
+
+		<p id="status_message" class="status-message" role="status" aria-live="polite" aria-atomic="true"></p>
+		<footer>
+			<p><span class="local-dot" aria-hidden="true"></span><span id="offline_status">Local only</span> · No accounts. No server.</p>
+			<p>Only provider names and rules are saved in this browser. Export them for a backup.</p>
+			<p class="install-hint">Install from your browser menu. On iPhone: Share → Add to Home Screen.</p>
+		</footer>
+		<noscript><p class="status-message error">JavaScript is needed to generate passwords on your device.</p></noscript>
 	</main>
-	<dialog id="new_entry_dialog">
-		<form method="dialog">
+
+	<dialog id="new_entry_dialog" aria-labelledby="dialog_title">
+		<form id="source_form">
+			<div>
+				<p class="eyebrow">Provider settings</p>
+				<h2 id="dialog_title">Add provider</h2>
+			</div>
 			<label for="service_name">
-				Service Name
-				<input type="text" name="service_name" id="service_name">
+				Provider name
+				<input type="text" name="service_name" id="service_name" required
+					autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="e.g. example.com"
+					aria-describedby="service_hint">
+				<span class="field-hint" id="service_hint">Used exactly as typed. Changing it changes your password.</span>
 			</label>
-			<label for="service_name">
-				Password Length
-				<input type="number" name="password_length" id="password_length" min="8" max="40" value="16">
+			<label for="password_length">
+				Base password length
+				<input type="number" name="password_length" id="password_length" min="8" max="40" value="16" required>
 			</label>
+			<fieldset>
+				<legend>Optional password rules</legend>
+				<label for="extra_characters">
+					Append characters
+					<input type="text" name="extra_characters" id="extra_characters" placeholder="e.g. !9"
+						autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="suffix_hint">
+					<span class="field-hint" id="suffix_hint">Added after the base password, increasing its total length.</span>
+				</label>
+				<div class="replacement-fields">
+					<label for="replace_from">
+						Replace symbols
+						<input type="text" name="replace_from" id="replace_from" placeholder="e.g. +/="
+							autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="replacement_hint">
+					</label>
+					<label for="replace_to">
+						With symbols
+						<input type="text" name="replace_to" id="replace_to" placeholder="e.g. -_!"
+							autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="replacement_hint">
+					</label>
+				</div>
+				<p class="field-hint" id="replacement_hint">Paired by position: +/= → -_!. Use equal character counts and no repeats in Replace symbols. Replaces every match in the base password in one pass, before appending. Rules are saved as plain text, not secrets.</p>
+			</fieldset>
+			<p id="dialog_status" class="field-hint error" role="alert" hidden></p>
 			<div class="form-actions">
-				<button class="secondary-btn" type="submit" value="cancel">Close</button>
-				<button class="primary-btn" type="submit" value="add">Add</button>
+				<button class="danger-btn" id="delete_source_btn" type="button" hidden>Delete</button>
+				<button class="secondary-btn" id="cancel_source_btn" type="button">Cancel</button>
+				<button class="primary-btn" id="save_source_btn" type="submit">Save provider</button>
 			</div>
 		</form>
 	</dialog>
-	<script src="main.js"></script>
 </body>
+</html>
